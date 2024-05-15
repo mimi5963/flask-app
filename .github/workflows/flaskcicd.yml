@@ -1,0 +1,33 @@
+name: Flask CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    #checkout 한번 해주고
+    steps:
+    - uses: actions/checkout@v4
+    #setup으로 파이썬 setup해주는 actions
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    #연관 라이브러리 다운받기 
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    #Test 스크립트 한 라인으로 유닛테스트 돌아가게 설정
+    - name: Run tests
+      run: |
+        python -m unittest discover tests
+    #docker 이미지 빌드 -> 추가로 레지스트리에 저장해줘야한다.
+    - name: Build Docker image
+      run: |
+        docker build -t flask-app:latest .
+    
+    # Optional: Add additional steps to push the Docker image to a registry like Docker Hub
